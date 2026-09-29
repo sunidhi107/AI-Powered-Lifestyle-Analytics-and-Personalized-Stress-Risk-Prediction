@@ -1,0 +1,437 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics — StressRisk AI{% endblock %}
+{% block breadcrumb %}Analytics{% endblock %}
+
+{% block content %}
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-heading">
+        <h1>Stress & Lifestyle Analytics</h1>
+        <div class="subtitle">Longitudinal analysis computed exclusively from your recorded assessments.</div>
+    </div>
+
+    <div class="topbar-actions">
+        <a href="{{ url_for('assessment') }}" class="btn btn-primary btn-sm">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Record Assessment
+        </a>
+    </div>
+</div>
+
+{% if not history or history|length == 0 %}
+<!-- EMPTY STATE -->
+<div class="empty-state">
+    <div class="empty-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+    </div>
+    <h2 class="empty-title">No Assessment History Available</h2>
+    <p class="empty-desc">
+        Complete your first assessment to start charting stress score trajectories, sleep correlation, and physical activity patterns.
+    </p>
+    <a href="{{ url_for('assessment') }}" class="btn btn-primary">
+        Start First Assessment
+    </a>
+</div>
+
+{% else %}
+
+<!-- KPI OVERVIEW -->
+<div class="stats">
+    <div class="stat-card">
+        <div class="stat-card-top">
+            <span class="stat-title">Total Assessments</span>
+            <div class="stat-icon primary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+        </div>
+        <div class="stat-value">{{ history|length }}</div>
+        <div class="stat-meta">Recorded evaluations</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-top">
+            <span class="stat-title">Latest Stress Score</span>
+            <div class="stat-icon {% if risk_level == 'High Risk' %}danger{% elif risk_level == 'Medium Risk' %}warning{% else %}success{% endif %}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            </div>
+        </div>
+        <div class="stat-value {% if risk_level == 'High Risk' %}high{% elif risk_level == 'Medium Risk' %}medium{% else %}low{% endif %}">
+            {{ prediction }}<span style="font-size: 1.1rem; color: var(--color-text-muted);">/10</span>
+        </div>
+        <div class="stat-meta">{{ risk_level }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-top">
+            <span class="stat-title">Latest Sleep Duration</span>
+            <div class="stat-icon teal">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+            </div>
+        </div>
+        <div class="stat-value">{{ sleep_duration }} <span style="font-size: 1.1rem; color: var(--color-text-muted);">hrs</span></div>
+        <div class="stat-meta">Quality: {{ quality_of_sleep }}/10</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-card-top">
+            <span class="stat-title">Latest Heart Rate</span>
+            <div class="stat-icon danger">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+            </div>
+        </div>
+        <div class="stat-value">{{ heart_rate }} <span style="font-size: 1.1rem; color: var(--color-text-muted);">bpm</span></div>
+        <div class="stat-meta">Steps: {{ daily_steps }}</div>
+    </div>
+</div>
+
+<!-- CHARTS GRID 1: STRESS TREND & RISK DISTRIBUTION -->
+<div class="grid-2-1">
+    <!-- CHART 1: STRESS OVER TIME -->
+    <div class="card">
+        <div class="card-header">
+            <h2>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-primary);"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                Stress Score Trajectory
+            </h2>
+            <span class="badge badge-primary">Chronological Trend</span>
+        </div>
+        <p class="card-subtitle">Progression of predicted stress scores across completed assessments.</p>
+        <div style="position: relative; height: 280px; width: 100%;">
+            <canvas id="stressTrendChart"></canvas>
+        </div>
+    </div>
+
+    <!-- CHART 2: RISK CATEGORY DISTRIBUTION -->
+    <div class="card">
+        <div class="card-header">
+            <h2>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-teal);"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 1 10 10h-10z"></path></svg>
+                Risk Distribution
+            </h2>
+        </div>
+        <p class="card-subtitle">Frequency across risk categories.</p>
+        <div style="position: relative; height: 240px; width: 100%; display: flex; align-items: center; justify-content: center;">
+            <canvas id="riskDistributionChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- CHARTS GRID 2: SLEEP VS STRESS & ACTIVITY VS STRESS -->
+<div class="grid-2">
+    <!-- CHART 3: SLEEP VS STRESS -->
+    <div class="card">
+        <div class="card-header">
+            <h2>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #6366f1;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                Sleep Duration vs Stress Score
+            </h2>
+        </div>
+        <p class="card-subtitle">Observation of rest hours alongside estimated stress levels.</p>
+        <div style="position: relative; height: 260px; width: 100%;">
+            <canvas id="sleepVsStressChart"></canvas>
+        </div>
+    </div>
+
+    <!-- CHART 4: PHYSICAL ACTIVITY VS STRESS -->
+    <div class="card">
+        <div class="card-header">
+            <h2>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #059669;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                Physical Activity vs Stress
+            </h2>
+        </div>
+        <p class="card-subtitle">Daily exercise minutes alongside estimated stress levels.</p>
+        <div style="position: relative; height: 260px; width: 100%;">
+            <canvas id="activityVsStressChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- CHARTS GRID 3: HEART RATE TREND -->
+<div class="card" style="margin-top: 1.5rem;">
+    <div class="card-header">
+        <h2>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #ef4444;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+            Resting Heart Rate Trend
+        </h2>
+        <span class="badge badge-neutral">Cardiovascular Baseline</span>
+    </div>
+    <p class="card-subtitle">Tracking resting beats per minute across historical assessment logs.</p>
+    <div style="position: relative; height: 260px; width: 100%;">
+        <canvas id="heartRateChart"></canvas>
+    </div>
+</div>
+
+{% endif %}
+
+{% endblock %}
+
+{% block extra_scripts %}
+{% if history and history|length > 0 %}
+<script>
+    const historyData = {{ history|tojson }};
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const labels = historyData.map((item, idx) => {
+            if (item.assessment_date) {
+                return item.assessment_date.substring(5, 10);
+            }
+            return `Eval #${idx + 1}`;
+        });
+
+        const stressScores = historyData.map(item => parseFloat(item.stress_level || item.stress_prediction || 0));
+        const sleepHours = historyData.map(item => parseFloat(item.sleep_duration || 0));
+        const activityMinutes = historyData.map(item => parseFloat(item.physical_activity || 0));
+
+        // Count risk categories
+        let lowCount = 0, medCount = 0, highCount = 0;
+        historyData.forEach(item => {
+            const r = item.risk_level || '';
+            if (r.includes('Low')) lowCount++;
+            else if (r.includes('High')) highCount++;
+            else medCount++;
+        });
+
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const gridColor = isDark ? '#1e293b' : '#f1f5f9';
+        const textColor = isDark ? '#94a3b8' : '#64748b';
+
+        // 1. Stress Trend Chart
+        const ctxTrend = document.getElementById('stressTrendChart');
+        if (ctxTrend) {
+            new Chart(ctxTrend, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Stress Score (0-10)',
+                        data: stressScores,
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.08)',
+                        fill: true,
+                        tension: 0.35,
+                        pointBackgroundColor: '#4f46e5',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        borderWidth: 2.5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 10,
+                            grid: { color: gridColor },
+                            ticks: { color: textColor, stepSize: 2 }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: textColor }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // 2. Risk Distribution Donut Chart
+        const ctxDist = document.getElementById('riskDistributionChart');
+        if (ctxDist) {
+            new Chart(ctxDist, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Low Risk', 'Medium Risk', 'High Risk'],
+                    datasets: [{
+                        data: [lowCount, medCount, highCount],
+                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 2,
+                        borderColor: isDark ? '#131f33' : '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: textColor, padding: 12, usePointStyle: true }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 3. Sleep vs Stress Chart
+        const ctxSleep = document.getElementById('sleepVsStressChart');
+        if (ctxSleep) {
+            new Chart(ctxSleep, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Sleep Duration (hrs)',
+                            data: sleepHours,
+                            backgroundColor: '#6366f1',
+                            borderRadius: 6,
+                            barPercentage: 0.5
+                        },
+                        {
+                            label: 'Stress Level',
+                            data: stressScores,
+                            backgroundColor: '#f59e0b',
+                            borderRadius: 6,
+                            barPercentage: 0.5
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 12,
+                            grid: { color: gridColor },
+                            ticks: { color: textColor }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: textColor }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { color: textColor, usePointStyle: true }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 4. Activity vs Stress Chart
+        const ctxActivity = document.getElementById('activityVsStressChart');
+        if (ctxActivity) {
+            new Chart(ctxActivity, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Physical Activity (min/d)',
+                            data: activityMinutes,
+                            borderColor: '#059669',
+                            backgroundColor: 'rgba(5, 150, 105, 0.08)',
+                            fill: true,
+                            tension: 0.3,
+                            yAxisID: 'yActivity',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Stress Level (0-10)',
+                            data: stressScores,
+                            borderColor: '#dc2626',
+                            borderDash: [5, 5],
+                            tension: 0.3,
+                            yAxisID: 'yStress',
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        yActivity: {
+                            type: 'linear',
+                            position: 'left',
+                            beginAtZero: true,
+                            grid: { color: gridColor },
+                            ticks: { color: textColor }
+                        },
+                        yStress: {
+                            type: 'linear',
+                            position: 'right',
+                            min: 0,
+                            max: 10,
+                            grid: { display: false },
+                            ticks: { color: textColor }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: textColor }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { color: textColor, usePointStyle: true }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 5. Heart Rate Trend Chart
+        const heartRates = historyData.map(item => parseFloat(item.heart_rate || 70));
+        const ctxHR = document.getElementById('heartRateChart');
+        if (ctxHR) {
+            new Chart(ctxHR, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Resting Heart Rate (bpm)',
+                        data: heartRates,
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                        fill: true,
+                        tension: 0.35,
+                        pointBackgroundColor: '#ef4444',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        borderWidth: 2.5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            min: 40,
+                            max: 140,
+                            grid: { color: gridColor },
+                            ticks: { color: textColor, stepSize: 20 }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: textColor }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { color: textColor, usePointStyle: true }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endif %}
+{% endblock %}

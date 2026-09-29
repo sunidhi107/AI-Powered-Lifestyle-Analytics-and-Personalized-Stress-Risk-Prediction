@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}Mindfulness & Wellness — StressRisk AI{% endblock %}
+{% block breadcrumb %}Mindfulness{% endblock %}
+
+{% block content %}
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-heading">
+        <h1>Mindfulness & Stress Reset</h1>
+        <div class="subtitle">Guided breathwork, sensory grounding, and restorative relaxation practices.</div>
+    </div>
+</div>
+
+<!-- 1. INTERACTIVE BOX BREATHING EXERCISE -->
+<div class="card" style="margin-bottom: 2rem;">
+    <div class="card-header">
+        <h2>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #6366f1;"><circle cx="12" cy="12" r="10"></circle><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path></svg>
+            Box Breathing Exercise (4-4-4-4)
+        </h2>
+        <span class="badge badge-primary">Vagus Nerve Calming</span>
+    </div>
+    <p class="card-subtitle">Equal-ratio breathwork helps balance the autonomic nervous system and lower acute physiological arousal.</p>
+
+    <div class="breathing-container">
+        <!-- Visual Breathing Circle -->
+        <div class="breath-circle-outer">
+            <div class="breath-circle-inner" id="breathCircle">
+                <span class="breath-action" id="breathAction">Ready</span>
+                <span class="breath-timer" id="breathTimer">4s</span>
+            </div>
+        </div>
+
+        <div style="font-size: 0.95rem; font-weight: 600; color: var(--color-text-title); margin-bottom: 0.25rem;" id="breathInstruction">
+            Press Start to begin a guided 4-count breathing cycle.
+        </div>
+        <div style="font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 1.5rem;" id="cycleCount">
+            Completed Cycles: 0
+        </div>
+
+        <!-- Controls -->
+        <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <button type="button" class="btn btn-primary" id="startBtn" onclick="toggleBreathing()">
+                <svg id="playIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <span id="startBtnText">Start Exercise</span>
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="resetBreathing()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 2v6h6M21.5 22v-6h-6"></path><path d="M22 11.5A10 10 0 0 0 3.2 7.2M2 12.5a10 10 0 0 0 18.8 4.2"></path></svg>
+                Reset
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 2. SENSORY GROUNDING & RELAXATION GUIDANCE -->
+<div class="grid-2">
+
+    <!-- 5-4-3-2-1 SENSORY GROUNDING -->
+    <div class="card">
+        <div class="card-header">
+            <h3>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-teal);"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                5-4-3-2-1 Sensory Grounding
+            </h3>
+            <span class="badge badge-neutral">Mental Anchor</span>
+        </div>
+        <p class="card-subtitle">Use your five senses to ground your awareness into the present moment.</p>
+
+        <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+            <div style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.75rem; background: var(--color-bg-subtle); border-radius: var(--radius-md);">
+                <span style="font-weight: 800; color: #4f46e5; width: 22px;">5</span>
+                <span style="font-size: 0.9rem; color: var(--color-text-title);">Notice <strong>5 things you can see</strong> around you right now.</span>
+            </div>
+            <div style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.75rem; background: var(--color-bg-subtle); border-radius: var(--radius-md);">
+                <span style="font-weight: 800; color: #0d9488; width: 22px;">4</span>
+                <span style="font-size: 0.9rem; color: var(--color-text-title);">Acknowledge <strong>4 things you can physically touch or feel</strong>.</span>
+            </div>
+            <div style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.75rem; background: var(--color-bg-subtle); border-radius: var(--radius-md);">
+                <span style="font-weight: 800; color: #d97706; width: 22px;">3</span>
+                <span style="font-size: 0.9rem; color: var(--color-text-title);">Listen for <strong>3 distinct sounds</strong> in your environment.</span>
+            </div>
+            <div style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.75rem; background: var(--color-bg-subtle); border-radius: var(--radius-md);">
+                <span style="font-weight: 800; color: #7c3aed; width: 22px;">2</span>
+                <span style="font-size: 0.9rem; color: var(--color-text-title);">Identify <strong>2 scents</strong> you can detect in the air.</span>
+            </div>
+            <div style="display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.75rem; background: var(--color-bg-subtle); border-radius: var(--radius-md);">
+                <span style="font-weight: 800; color: #059669; width: 22px;">1</span>
+                <span style="font-size: 0.9rem; color: var(--color-text-title);">Notice <strong>1 taste or physical sensation</strong> in your mouth.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROGRESSIVE MUSCLE RELAXATION -->
+    <div class="card">
+        <div class="card-header">
+            <h3>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #6366f1;"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path></svg>
+                Progressive Muscle Body Scan
+            </h3>
+            <span class="badge badge-neutral">Somatic Reset</span>
+        </div>
+        <p class="card-subtitle">Systematically release stored tension across key muscle groups.</p>
+
+        <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+            <div style="padding: 0.75rem; border-left: 3px solid var(--color-primary); background: var(--color-bg-subtle); border-radius: 0 var(--radius-md) var(--radius-md) 0;">
+                <div style="font-weight: 700; font-size: 0.92rem; color: var(--color-text-title);">1. Facial & Jaw Release</div>
+                <div style="font-size: 0.85rem; color: var(--color-text-muted); margin-top: 2px;">Unclench your jaw, soften your tongue, and let your brow smooth out completely.</div>
+            </div>
+
+            <div style="padding: 0.75rem; border-left: 3px solid var(--color-teal); background: var(--color-bg-subtle); border-radius: 0 var(--radius-md) var(--radius-md) 0;">
+                <div style="font-weight: 700; font-size: 0.92rem; color: var(--color-text-title);">2. Shoulder Drop</div>
+                <div style="font-size: 0.85rem; color: var(--color-text-muted); margin-top: 2px;">Inhale deeply and gently draw your shoulders up to your ears; exhale and let them drop down completely.</div>
+            </div>
+
+            <div style="padding: 0.75rem; border-left: 3px solid #d97706; background: var(--color-bg-subtle); border-radius: 0 var(--radius-md) var(--radius-md) 0;">
+                <div style="font-weight: 700; font-size: 0.92rem; color: var(--color-text-title);">3. Diaphragm Softening</div>
+                <div style="font-size: 0.85rem; color: var(--color-text-muted); margin-top: 2px;">Allow your abdomen to expand naturally with each breath without holding your stomach in.</div>
+            </div>
+
+            <div style="padding: 0.75rem; border-left: 3px solid #7c3aed; background: var(--color-bg-subtle); border-radius: 0 var(--radius-md) var(--radius-md) 0;">
+                <div style="font-weight: 700; font-size: 0.92rem; color: var(--color-text-title);">4. Grounding Feet</div>
+                <div style="font-size: 0.85rem; color: var(--color-text-muted); margin-top: 2px;">Feel the firm pressure of both feet resting flat on the floor, releasing leg tension into the ground.</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- 3. DAILY WELLNESS TIPS -->
+<div class="card" style="margin-top: 2rem;">
+    <div class="card-header">
+        <h2>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #059669;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            Evidence-Based Micro-Wellness Tips
+        </h2>
+    </div>
+
+    <div class="grid-3" style="margin-bottom: 0;">
+        <div style="padding: 1rem; border-radius: var(--radius-md); background: var(--color-bg-subtle);">
+            <div style="font-weight: 700; color: var(--color-text-title); margin-bottom: 0.35rem;">Morning Sunlight Exposure</div>
+            <div style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.5;">10–15 minutes of outdoor daylight within an hour of waking stabilizes the circadian clock and elevates daytime alertness.</div>
+        </div>
+
+        <div style="padding: 1rem; border-radius: var(--radius-md); background: var(--color-bg-subtle);">
+            <div style="font-weight: 700; color: var(--color-text-title); margin-bottom: 0.35rem;">Post-Work Cognitive Closure</div>
+            <div style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.5;">Write down tomorrow's top 3 tasks before ending your workday. This psychological ritual prevents work thoughts from intruding into evening recovery.</div>
+        </div>
+
+        <div style="padding: 1rem; border-radius: var(--radius-md); background: var(--color-bg-subtle);">
+            <div style="font-weight: 700; color: var(--color-text-title); margin-bottom: 0.35rem;">Physiological Sigh</div>
+            <div style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.5;">Take two quick inhales through the nose, followed by one long, slow exhale through the mouth to rapidly discharge acute sympathetic stress.</div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    let isBreathing = false;
+    let breathInterval = null;
+    let phaseIndex = 0;
+    let secondsLeft = 4;
+    let completedCycles = 0;
+
+    const phases = [
+        { name: 'Inhale', scale: '1.4', instruction: 'Slowly breathe in through your nose...' },
+        { name: 'Hold', scale: '1.4', instruction: 'Hold gently, keeping chest open...' },
+        { name: 'Exhale', scale: '1.0', instruction: 'Slowly release all air through your mouth...' },
+        { name: 'Hold', scale: '1.0', instruction: 'Rest in the pause before the next breath...' }
+    ];
+
+    function toggleBreathing() {
+        if (isBreathing) {
+            pauseBreathing();
+        } else {
+            startBreathing();
+        }
+    }
+
+    function startBreathing() {
+        isBreathing = true;
+        document.getElementById('startBtnText').textContent = 'Pause Exercise';
+        document.getElementById('playIcon').innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
+
+        tick();
+        breathInterval = setInterval(tick, 1000);
+    }
+
+    function pauseBreathing() {
+        isBreathing = false;
+        clearInterval(breathInterval);
+        document.getElementById('startBtnText').textContent = 'Resume Exercise';
+        document.getElementById('playIcon').innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+    }
+
+    function resetBreathing() {
+        pauseBreathing();
+        phaseIndex = 0;
+        secondsLeft = 4;
+        completedCycles = 0;
+        document.getElementById('startBtnText').textContent = 'Start Exercise';
+        document.getElementById('breathAction').textContent = 'Ready';
+        document.getElementById('breathTimer').textContent = '4s';
+        document.getElementById('breathInstruction').textContent = 'Press Start to begin a guided 4-count breathing cycle.';
+        document.getElementById('cycleCount').textContent = 'Completed Cycles: 0';
+        document.getElementById('breathCircle').style.transform = 'scale(1)';
+    }
+
+    function tick() {
+        const currentPhase = phases[phaseIndex];
+        const circle = document.getElementById('breathCircle');
+
+        document.getElementById('breathAction').textContent = currentPhase.name;
+        document.getElementById('breathTimer').textContent = `${secondsLeft}s`;
+        document.getElementById('breathInstruction').textContent = currentPhase.instruction;
+        circle.style.transform = `scale(${currentPhase.scale})`;
+
+        secondsLeft--;
+
+        if (secondsLeft < 0) {
+            phaseIndex = (phaseIndex + 1) % phases.length;
+            secondsLeft = 4;
+
+            if (phaseIndex === 0) {
+                completedCycles++;
+                document.getElementById('cycleCount').textContent = `Completed Cycles: ${completedCycles}`;
+            }
+        }
+    }
+</script>
+{% endblock %}

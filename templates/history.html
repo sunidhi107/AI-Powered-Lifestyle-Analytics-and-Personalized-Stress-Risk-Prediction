@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Assessment History — StressRisk AI{% endblock %}
+{% block breadcrumb %}History{% endblock %}
+
+{% block content %}
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-heading">
+        <h1>Assessment History</h1>
+        <div class="subtitle">Review all your previous evaluations, vitals, and stress predictions over time.</div>
+    </div>
+
+    <div class="topbar-actions">
+        <a href="{{ url_for('assessment') }}" class="btn btn-primary btn-sm">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            New Assessment
+        </a>
+    </div>
+</div>
+
+{% if not history or history|length == 0 %}
+<!-- EMPTY STATE -->
+<div class="empty-state">
+    <div class="empty-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+    </div>
+    <h2 class="empty-title">No Historical Records</h2>
+    <p class="empty-desc">
+        You haven't completed any assessments yet. Take your first lifestyle assessment to build your history log.
+    </p>
+    <a href="{{ url_for('assessment') }}" class="btn btn-primary">
+        Start First Assessment
+    </a>
+</div>
+
+{% else %}
+
+<!-- FILTER AND SEARCH BAR -->
+<div class="card" style="padding: 1.25rem; margin-bottom: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+
+        <!-- FILTER TABS -->
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="btn btn-secondary btn-sm filter-btn active" onclick="filterRisk('all', this)">All ({{ history|length }})</button>
+            <button class="btn btn-secondary btn-sm filter-btn" onclick="filterRisk('Low Risk', this)">Low Risk</button>
+            <button class="btn btn-secondary btn-sm filter-btn" onclick="filterRisk('Medium Risk', this)">Medium Risk</button>
+            <button class="btn btn-secondary btn-sm filter-btn" onclick="filterRisk('High Risk', this)">High Risk</button>
+        </div>
+
+        <!-- SEARCH INPUT -->
+        <div style="position: relative; min-width: 240px;">
+            <input
+                type="text"
+                id="historySearch"
+                class="form-control"
+                placeholder="Search date or occupation..."
+                onkeyup="searchHistory()"
+                style="padding-left: 2.2rem; font-size: 0.85rem;"
+            >
+            <span style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--color-text-subtle);">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </span>
+        </div>
+
+    </div>
+</div>
+
+<!-- HISTORY TABLE -->
+<div class="card" style="padding: 0; overflow: hidden;">
+    <div class="table-responsive">
+        <table class="table" id="historyTable">
+            <thead>
+                <tr>
+                    <th>Date & Time</th>
+                    <th>Stress Score</th>
+                    <th>Risk Category</th>
+                    <th>Sleep</th>
+                    <th>Activity</th>
+                    <th>Heart Rate & BP</th>
+                    <th>Occupation</th>
+                    <th style="text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in history %}
+                <tr class="history-row" data-risk="{{ item.risk_level }}" data-search="{{ item.assessment_date }} {{ item.occupation }}">
+                    <td style="font-weight: 600; white-space: nowrap;">
+                        {{ (item.assessment_date or item.created_at or "-")[:16].replace("T", " ") }}
+                    </td>
+                    <td>
+                        <span style="font-family: var(--font-sans); font-size: 1.15rem; font-weight: 800; color: var(--color-text-title);">
+                            {{ item.stress_level or item.stress_prediction or 0 }}
+                        </span>
+                        <span style="font-size: 0.8rem; color: var(--color-text-muted);">/10</span>
+                    </td>
+                    <td>
+                        <span class="badge {% if item.risk_level == 'High Risk' %}badge-high{% elif item.risk_level == 'Medium Risk' %}badge-medium{% else %}badge-low{% endif %}">
+                            {{ item.risk_level or "Low Risk" }}
+                        </span>
+                    </td>
+                    <td>
+                        <div>{{ item.sleep_duration }} hrs</div>
+                        <small style="color: var(--color-text-muted);">Quality: {{ item.quality_of_sleep }}/10</small>
+                    </td>
+                    <td>
+                        <div>{{ item.physical_activity }} min/d</div>
+                        <small style="color: var(--color-text-muted);">{{ item.daily_steps }} steps</small>
+                    </td>
+                    <td>
+                        <div>{{ item.heart_rate }} bpm</div>
+                        <small style="color: var(--color-text-muted);">{{ item.systolic_bp }}/{{ item.diastolic_bp }} mmHg</small>
+                    </td>
+                    <td>
+                        <span style="font-size: 0.88rem; color: var(--color-text-body);">
+                            {{ (item.occupation or "-")|capitalize }}
+                        </span>
+                    </td>
+                    <td style="text-align: right;">
+                        <button type="button" class="btn btn-outline btn-sm" onclick="showDetailsModal({{ loop.index0 }})">
+                            Details
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- DETAILS MODAL -->
+<div id="detailsModal" class="sidebar-backdrop" style="display: none; align-items: center; justify-content: center; z-index: 200;">
+    <div class="card" style="max-width: 640px; width: 90%; max-height: 85vh; overflow-y: auto; box-shadow: var(--shadow-xl); position: relative;">
+        <div class="card-header" style="border-bottom: 1px solid var(--color-border); padding-bottom: 1rem; margin-bottom: 1rem;">
+            <h2>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-primary);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                Assessment Snapshot
+            </h2>
+            <button type="button" onclick="closeDetailsModal()" class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.6rem;">✕</button>
+        </div>
+
+        <div id="modalBody" style="display: flex; flex-direction: column; gap: 1rem;">
+            <!-- Populated dynamically via JS -->
+        </div>
+
+        <div style="margin-top: 1.5rem; text-align: right;">
+            <button type="button" onclick="closeDetailsModal()" class="btn btn-secondary">Close</button>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+
+{% endblock %}
+
+{% block extra_scripts %}
+{% if history and history|length > 0 %}
+<script>
+    const fullHistory = {{ history|tojson }};
+    let currentFilter = 'all';
+
+    function filterRisk(category, btn) {
+        currentFilter = category;
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('btn-primary', 'active'));
+        btn.classList.add('btn-primary', 'active');
+        applyFilters();
+    }
+
+    function searchHistory() {
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const query = (document.getElementById('historySearch')?.value || '').toLowerCase();
+        const rows = document.querySelectorAll('.history-row');
+
+        rows.forEach(row => {
+            const risk = row.getAttribute('data-risk') || '';
+            const searchData = (row.getAttribute('data-search') || '').toLowerCase();
+
+            const matchesRisk = (currentFilter === 'all') || (risk.toLowerCase() === currentFilter.toLowerCase());
+            const matchesSearch = !query || searchData.includes(query);
+
+            row.style.display = (matchesRisk && matchesSearch) ? '' : 'none';
+        });
+    }
+
+    function showDetailsModal(index) {
+        const item = fullHistory[index];
+        if (!item) return;
+
+        let healthData = {};
+        if (item.health_data) {
+            try {
+                healthData = typeof item.health_data === 'string' ? JSON.parse(item.health_data) : item.health_data;
+            } catch (e) {
+                healthData = item;
+            }
+        } else {
+            healthData = item;
+        }
+
+        const modal = document.getElementById('detailsModal');
+        const body = document.getElementById('modalBody');
+
+        body.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: var(--color-bg-subtle); border-radius: var(--radius-md);">
+                <div>
+                    <div style="font-size: 0.8rem; color: var(--color-text-muted);">Recorded On</div>
+                    <div style="font-weight: 700; color: var(--color-text-title);">${(item.assessment_date || item.created_at || '').replace('T', ' ')}</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.8rem; color: var(--color-text-muted);">Stress Prediction</div>
+                    <div style="font-size: 1.25rem; font-weight: 800; color: var(--color-primary);">${item.stress_level || item.stress_prediction || 0}/10 (${item.risk_level || 'Low Risk'})</div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <tbody>
+                        <tr><td><strong>Age / Gender</strong></td><td>${healthData.age || item.age || '-'} yrs / ${healthData.gender || item.gender || '-'}</td></tr>
+                        <tr><td><strong>Occupation</strong></td><td>${healthData.occupation || item.occupation || '-'}</td></tr>
+                        <tr><td><strong>Sleep Duration & Quality</strong></td><td>${healthData.sleep_duration || item.sleep_duration || '-'} hrs (Quality: ${healthData.quality_of_sleep || item.quality_of_sleep || '-'}/10)</td></tr>
+                        <tr><td><strong>Physical Activity & Steps</strong></td><td>${healthData.physical_activity || item.physical_activity || '-'} min/d (${healthData.daily_steps || item.daily_steps || '-'} steps)</td></tr>
+                        <tr><td><strong>Heart Rate & Blood Pressure</strong></td><td>${healthData.heart_rate || item.heart_rate || '-'} bpm (${healthData.systolic_bp || item.systolic_bp || '-'}/${healthData.diastolic_bp || item.diastolic_bp || '-'} mmHg)</td></tr>
+                        <tr><td><strong>BMI & Category</strong></td><td>${healthData.bmi || '-'} (${healthData.bmi_category || item.bmi_category || '-'})</td></tr>
+                        <tr><td><strong>Work & Screen Time</strong></td><td>${healthData.working_hours || '-'} hrs work / ${healthData.screen_time || '-'} hrs screen</td></tr>
+                        <tr><td><strong>Hydration & Caffeine</strong></td><td>${healthData.water_intake || '-'} L water / ${healthData.caffeine_intake || '-'} cups caffeine</td></tr>
+                        <tr><td><strong>Social Interaction</strong></td><td>${healthData.social_interaction || '-'} hrs/day</td></tr>
+                        <tr><td><strong>Habits (Smoking / Alcohol)</strong></td><td>Smoking: ${healthData.smoking_habit || '-'} / Alcohol: ${healthData.alcohol_intake || '-'}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        modal.style.display = 'flex';
+    }
+
+    function closeDetailsModal() {
+        const modal = document.getElementById('detailsModal');
+        if (modal) modal.style.display = 'none';
+    }
+</script>
+{% endif %}
+{% endblock %}

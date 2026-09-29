@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}StressRisk AI — AI-Powered Lifestyle Analytics and Personalized Stress Risk Prediction{% endblock %}</title>
+
+    <!-- Theme Initializer (prevents flicker) -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('stressRiskTheme');
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+        })();
+    </script>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Chart.js for Healthcare Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- App Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<div class="app-layout">
+    {% include 'sidebar.html' %}
+
+    <main class="main">
+        <!-- Top Application Header Bar -->
+        <header style="padding: 1rem 2.5rem; background: var(--color-surface); border-bottom: 1px solid var(--color-border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 30;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <button class="mobile-menu-btn" onclick="toggleSidebar(true)" aria-label="Open Navigation Menu">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; color: var(--color-text-muted);">
+                    <span>StressRisk AI</span>
+                    <span>/</span>
+                    <span style="color: var(--color-text-title); font-weight: 600;">
+                        {% block breadcrumb %}{{ request.endpoint|capitalize }}{% endblock %}
+                    </span>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.85rem;">
+                <!-- Quick Theme Toggle -->
+                <button id="themeToggleBtn" onclick="toggleTheme()" class="btn btn-secondary btn-sm" title="Toggle Theme" style="padding: 0.45rem 0.75rem;">
+                    <span id="themeIcon">🌙</span>
+                    <span id="themeLabel" style="font-size: 0.8rem; margin-left: 4px;">Dark</span>
+                </button>
+
+                <!-- User Profile Pill -->
+                <a href="{{ url_for('profile') }}" style="display: flex; align-items: center; gap: 0.6rem; padding: 0.35rem 0.75rem; border-radius: var(--radius-full); background: var(--color-bg-subtle); border: 1px solid var(--color-border); text-decoration: none;">
+                    <div style="width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem;">
+                        {{ (user_name or "U")[0]|upper }}
+                    </div>
+                    <span style="font-size: 0.88rem; font-weight: 600; color: var(--color-text-title);">{{ user_name or "User" }}</span>
+                </a>
+            </div>
+        </header>
+
+        <div class="content-container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+</div>
+
+<script>
+    function toggleSidebar(open) {
+        const sidebar = document.getElementById('appSidebar');
+        const backdrop = document.getElementById('sidebarBackdrop');
+        if (open) {
+            sidebar.classList.add('sidebar-open');
+            backdrop.classList.add('active');
+        } else {
+            sidebar.classList.remove('sidebar-open');
+            backdrop.classList.remove('active');
+        }
+    }
+
+    function syncThemeUI() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const icon = document.getElementById('themeIcon');
+        const label = document.getElementById('themeLabel');
+        if (icon && label) {
+            icon.textContent = isDark ? '☀️' : '🌙';
+            label.textContent = isDark ? 'Light' : 'Dark';
+        }
+    }
+
+    function toggleTheme() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        if (isDark) {
+            document.documentElement.removeAttribute('data-theme');
+            document.body.classList.remove('settings-dark');
+            localStorage.setItem('stressRiskTheme', 'light');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.body.classList.add('settings-dark');
+            localStorage.setItem('stressRiskTheme', 'dark');
+        }
+        syncThemeUI();
+    }
+
+    document.addEventListener('DOMContentLoaded', syncThemeUI);
+</script>
+
+{% block extra_scripts %}{% endblock %}
+
+</body>
+</html>

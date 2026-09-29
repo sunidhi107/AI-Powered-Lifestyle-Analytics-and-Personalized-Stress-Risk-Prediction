@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}User Profile — StressRisk AI{% endblock %}
+{% block breadcrumb %}Profile{% endblock %}
+
+{% block content %}
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-heading">
+        <h1>User Profile</h1>
+        <div class="subtitle">Manage your account information and view your health assessment summary.</div>
+    </div>
+
+    <div class="topbar-actions">
+        <a href="{{ url_for('settings') }}" class="btn btn-secondary btn-sm">Account Settings</a>
+        <a href="{{ url_for('assessment') }}" class="btn btn-primary btn-sm">New Assessment</a>
+    </div>
+</div>
+
+<!-- USER PROFILE HEADER CARD -->
+<div class="card" style="margin-bottom: 2rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+            <div style="width: 72px; height: 72px; border-radius: var(--radius-full); background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 800; box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);">
+                {{ (user_name or "U")[0]|upper }}
+            </div>
+            <div>
+                <h2 style="font-size: 1.6rem; font-weight: 800; color: var(--color-text-title); margin-bottom: 0.25rem;">
+                    {{ user_name or "User" }}
+                </h2>
+                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                    <span style="color: var(--color-text-muted); font-size: 0.92rem;">{{ user_email }}</span>
+                    <span class="badge badge-primary">Active Profile</span>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem;">
+            <a href="{{ url_for('assessment') }}" class="btn btn-primary">
+                Update Assessment
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="grid-2">
+
+    <!-- SECTION 1: PERSONAL INFORMATION -->
+    <div class="card">
+        <div class="card-header">
+            <h2>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-primary);"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                Personal Information
+            </h2>
+        </div>
+        <p class="card-subtitle">Demographic profile utilized in baseline calculations.</p>
+
+        <div class="table-responsive">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td style="font-weight: 600; width: 45%;">Full Name</td>
+                        <td>{{ user_name or "Not set" }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 600;">Gender</td>
+                        <td>{{ gender or health.get("gender") or "Not set" }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 600;">Age</td>
+                        <td>{{ health.get("age", "-") }} years</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 600;">Stated Occupation</td>
+                        <td>{{ health.get("occupation", "-")|capitalize }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SECTION 2: ACCOUNT INFORMATION -->
+    <div class="card">
+        <div class="card-header">
+            <h2>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-teal);"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Account & Security
+            </h2>
+        </div>
+        <p class="card-subtitle">Credentials and session protection status.</p>
+
+        <div class="table-responsive">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td style="font-weight: 600; width: 45%;">Registered Email</td>
+                        <td>{{ user_email or "Not registered" }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 600;">Password Status</td>
+                        <td>
+                            <span class="badge badge-low" style="text-transform: none;">
+                                Protected (Werkzeug Hash)
+                            </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 600;">Role</td>
+                        <td>{{ user_role or "User" }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 600;">Session Authentication</td>
+                        <td>Active Cookie Session</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- SECTION 3: ASSESSMENT SUMMARY -->
+<div class="card" style="margin-top: 2rem;">
+    <div class="card-header">
+        <h2>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-accent);"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            Health & Assessment Summary
+        </h2>
+        <a href="{{ url_for('history') }}" class="btn btn-outline btn-sm">Full History</a>
+    </div>
+    <p class="card-subtitle">Snapshot of completed evaluations and current health baseline.</p>
+
+    <div class="stats" style="margin-bottom: 1.5rem;">
+        <div class="stat-card" style="padding: 1.25rem;">
+            <div class="stat-title">Completed Assessments</div>
+            <div class="stat-value" style="font-size: 1.85rem;">{{ assessment_count }}</div>
+        </div>
+
+        <div class="stat-card" style="padding: 1.25rem;">
+            <div class="stat-title">Latest Stress Score</div>
+            <div class="stat-value {% if risk_level == 'High Risk' %}high{% elif risk_level == 'Medium Risk' %}medium{% else %}low{% endif %}" style="font-size: 1.85rem;">
+                {{ prediction }}/10
+            </div>
+        </div>
+
+        <div class="stat-card" style="padding: 1.25rem;">
+            <div class="stat-title">Current Risk Status</div>
+            <div class="stat-value {% if risk_level == 'High Risk' %}high{% elif risk_level == 'Medium Risk' %}medium{% else %}low{% endif %}" style="font-size: 1.5rem;">
+                {{ risk_level }}
+            </div>
+        </div>
+
+        <div class="stat-card" style="padding: 1.25rem;">
+            <div class="stat-title">Typical Sleep Duration</div>
+            <div class="stat-value" style="font-size: 1.85rem;">{{ sleep_duration }} hrs</div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td style="font-weight: 600; width: 33%;">Resting Heart Rate: <strong>{{ heart_rate }} bpm</strong></td>
+                    <td style="font-weight: 600; width: 33%;">Blood Pressure: <strong>{{ health.get("systolic_bp", "-") }}/{{ health.get("diastolic_bp", "-") }} mmHg</strong></td>
+                    <td style="font-weight: 600; width: 33%;">Daily Steps: <strong>{{ daily_steps }}</strong></td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 600;">Work Hours: <strong>{{ health.get("working_hours", "-") }} hrs/d</strong></td>
+                    <td style="font-weight: 600;">Screen Time: <strong>{{ health.get("screen_time", "-") }} hrs/d</strong></td>
+                    <td style="font-weight: 600;">Hydration: <strong>{{ health.get("water_intake", "-") }} L/d</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

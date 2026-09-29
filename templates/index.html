@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StressRisk AI — AI-Powered Lifestyle & Stress Health Platform</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+
+    <style>
+        .landing-nav {
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--color-border);
+            z-index: 100;
+            padding: 1rem 5%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .landing-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .landing-links {
+            display: flex;
+            align-items: center;
+            gap: 1.75rem;
+        }
+
+        .landing-links a {
+            color: var(--color-text-body);
+            font-weight: 600;
+            font-size: 0.92rem;
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+
+        .landing-links a:hover {
+            color: var(--color-primary);
+        }
+
+        .landing-hero {
+            padding: 5rem 5% 4rem;
+            display: grid;
+            grid-template-columns: 1.15fr 1fr;
+            align-items: center;
+            gap: 3.5rem;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.45rem 1rem;
+            background: #eef2ff;
+            color: #4f46e5;
+            border-radius: var(--radius-full);
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            border: 1px solid #c7d2fe;
+            letter-spacing: 0.01em;
+        }
+
+        .hero-title {
+            font-size: 3.25rem;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+            color: var(--color-text-title);
+            margin-bottom: 1.25rem;
+        }
+
+        .hero-title span {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 1.15rem;
+            line-height: 1.65;
+            color: var(--color-text-muted);
+            margin-bottom: 2rem;
+            max-width: 540px;
+        }
+
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-visual-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero-visual-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 0.85rem;
+            box-shadow: 0 20px 45px -10px rgba(79, 70, 229, 0.14), 0 0 0 1px rgba(226, 232, 240, 0.85);
+            max-width: 520px;
+            width: 100%;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .hero-visual-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 25px 55px -12px rgba(79, 70, 229, 0.2), 0 0 0 1px rgba(199, 210, 254, 0.9);
+        }
+
+        .hero-img {
+            width: 100%;
+            height: auto;
+            border-radius: 18px;
+            display: block;
+        }
+
+        .landing-section {
+            padding: 5rem 5%;
+            max-width: 1250px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 680px;
+            margin: 0 auto 3.5rem;
+        }
+
+        .section-badge {
+            color: var(--color-primary);
+            font-weight: 700;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .section-title {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: var(--color-text-title);
+            margin-bottom: 0.85rem;
+            letter-spacing: -0.02em;
+        }
+
+        .section-desc {
+            color: var(--color-text-muted);
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        .feature-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: #cbd5e1;
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.15rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+
+        .step-card {
+            background: #ffffff;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: 2.75rem 2rem;
+            text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: #cbd5e1;
+        }
+
+        .pillar-card {
+            background: #ffffff;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .pillar-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .pillar-header {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.85rem;
+            border-bottom: 1px solid var(--color-border-subtle);
+        }
+
+        .factor-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.45rem 0.85rem;
+            background: var(--color-bg-subtle);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--color-text-title);
+            margin: 0.25rem;
+        }
+
+        .factor-tag-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--color-primary);
+        }
+
+        .cta-banner {
+            background: linear-gradient(145deg, #1e1b4b 0%, #312e81 60%, #4338ca 100%);
+            border-radius: var(--radius-xl);
+            padding: 4.5rem 3rem;
+            text-align: center;
+            color: #ffffff;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .footer-landing {
+            background: #091325;
+            color: #94a3b8;
+            padding: 4rem 5% 2.5rem;
+            border-top: 1px solid #1e293b;
+        }
+
+        @media (max-width: 992px) {
+            .landing-hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+                padding-top: 3rem;
+            }
+            .hero-desc {
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .hero-actions {
+                justify-content: center;
+            }
+            .landing-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<header class="landing-nav">
+    <a href="{{ url_for('home') }}" class="landing-brand">
+        <div class="brand-icon-wrapper">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a9 9 0 0 1 9 9c0 3.2-1.7 6-4.2 7.6L12 22l-4.8-3.4C4.7 17 3 14.2 3 11a9 9 0 0 1 9-9z"></path>
+                <path d="M9 10h.01"></path>
+                <path d="M15 10h.01"></path>
+                <path d="M9.5 15a3.5 3.5 0 0 0 5 0"></path>
+            </svg>
+        </div>
+        <span style="font-family: var(--font-sans); font-size: 1.25rem; font-weight: 800; color: var(--color-text-title);">
+            StressRisk <span style="color: var(--color-primary);">AI</span>
+        </span>
+    </a>
+
+    <nav class="landing-links">
+        <a href="#about">What is StressRisk AI?</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#features">Key Features</a>
+        <a href="#factors">Lifestyle Factors</a>
+        <a href="#benefits">Benefits</a>
+    </nav>
+
+    <div style="display: flex; align-items: center; gap: 0.85rem;">
+        <a href="{{ url_for('login') }}" class="btn btn-outline btn-sm">Log In</a>
+        <a href="{{ url_for('assessment') }}" class="btn btn-primary btn-sm">Start Assessment</a>
+    </div>
+</header>
+
+<!-- 1. HERO SECTION -->
+<section class="landing-hero" id="home">
+    <div>
+        <div class="hero-badge">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a9 9 0 0 1 9 9c0 3.2-1.7 6-4.2 7.6L12 22l-4.8-3.4C4.7 17 3 14.2 3 11a9 9 0 0 1 9-9z"></path></svg>
+            StressRisk AI
+        </div>
+        <h1 class="hero-title">
+            AI-Powered Lifestyle &amp; <span>Stress Health Prediction</span>
+        </h1>
+        <p class="hero-desc">
+            Understand your daily lifestyle patterns and stress risk with clear, personalized health insights. Discover how sleep routines, physical activity, digital habits, and vitals influence your overall well-being.
+        </p>
+        <div class="hero-actions">
+            <a href="{{ url_for('assessment') }}" class="btn btn-primary btn-lg">
+                Start Assessment
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </a>
+            <a href="#how-it-works" class="btn btn-secondary btn-lg">
+                Explore How It Works
+            </a>
+        </div>
+    </div>
+
+    <div class="hero-visual-container">
+        <div class="hero-visual-card">
+            <img src="{{ url_for('static', filename='images/stress pic.png') }}"
+                 alt="Healthcare and Stress Wellness Visual"
+                 class="hero-img">
+        </div>
+    </div>
+</section>
+
+<!-- 2. WHAT IS STRESSRISK AI? -->
+<section class="landing-section" id="about" style="border-top: 1px solid var(--color-border);">
+    <div class="section-header">
+        <span class="section-badge">Platform Overview</span>
+        <h2 class="section-title">What is StressRisk AI?</h2>
+        <p class="section-desc">
+            A modern lifestyle and stress health platform designed to help you recognize how everyday habits influence your physical and mental well-being before fatigue compounds into burnout.
+        </p>
+    </div>
+
+    <div class="grid-3">
+        <div class="feature-card">
+            <div class="stat-icon primary" style="margin-bottom: 1.25rem;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+            </div>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem; color: var(--color-text-title);">Cardiovascular &amp; Vitals Awareness</h3>
+            <p style="color: var(--color-text-muted); font-size: 0.92rem; line-height: 1.6; margin-bottom: 0;">
+                Learn how resting heart rate, blood pressure, and physical indicators reflect your body's autonomic balance and stress load.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="stat-icon teal" style="margin-bottom: 1.25rem;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+            </div>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem; color: var(--color-text-title);">Rest &amp; Sleep Rhythm</h3>
+            <p style="color: var(--color-text-muted); font-size: 0.92rem; line-height: 1.6; margin-bottom: 0;">
+                Understand how sleep duration, sleep quality, and daily physical activity combine to support recovery and daily energy.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="stat-icon warning" style="margin-bottom: 1.25rem;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line></svg>
+            </div>
+            <h3 style="font-size: 1.15rem; margin-bottom: 0.5rem; color: var(--color-text-title);">Workload &amp; Daily Habits</h3>
+            <p style="color: var(--color-text-muted); font-size: 0.92rem; line-height: 1.6; margin-bottom: 0;">
+                See the influence of screen time, work schedule, hydration, caffeine, and social connection on your daily stress levels.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- 3. HOW IT WORKS -->
+<section class="landing-section" id="how-it-works">
+    <div class="section-header">
+        <span class="section-badge">Simple 3-Step Process</span>
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-desc">
+            A simple, user-oriented process designed to help you quickly assess your stress risk and take meaningful action.
+        </p>
+    </div>
+
+    <div class="grid-3">
+        <div class="step-card">
+            <div class="step-number" style="margin: 0 auto 1.25rem;">1</div>
+            <h3 style="font-size: 1.2rem; margin-bottom: 0.6rem; color: var(--color-text-title);">Share Your Lifestyle</h3>
+            <p style="color: var(--color-text-muted); font-size: 0.92rem; line-height: 1.6; margin-bottom: 0;">
+                Provide a few details about your sleep, activity, health and daily habits.
+            </p>
+        </div>
+
+        <div class="step-card">
+            <div class="step-number" style="margin: 0 auto 1.25rem; background: linear-gradient(135deg, #0d9488, #10b981);">2</div>
+            <h3 style="font-size: 1.2rem; margin-bottom: 0.6rem; color: var(--color-text-title);">Get Your Stress Risk</h3>
+            <p style="color: var(--color-text-muted); font-size: 0.92rem; line-height: 1.6; margin-bottom: 0;">
+                Your information is analyzed to generate a personalized stress-risk result.
+            </p>
+        </div>
+
+        <div class="step-card">
+            <div class="step-number" style="margin: 0 auto 1.25rem; background: linear-gradient(135deg, #7c3aed, #4f46e5);">3</div>
+            <h3 style="font-size: 1.2rem; margin-bottom: 0.6rem; color: var(--color-text-title);">Understand Your Results</h3>
+            <p style="color: var(--color-text-muted); font-size: 0.92rem; line-height: 1.6; margin-bottom: 0;">
+                Review your result and receive practical lifestyle recommendations.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- 4. KEY FEATURES SECTION -->
+<section class="landing-section" id="features" style="background: var(--color-bg-subtle); border-radius: var(--radius-xl); padding: 4.5rem 4%;">
+    <div class="section-header">
+        <span class="section-badge">Platform Capabilities</span>
+        <h2 class="section-title">Key Features</h2>
+        <p class="section-desc">
+            A comprehensive suite of wellness tools built to help you assess, understand, and manage your lifestyle health.
+        </p>
+    </div>
+
+    <div class="feature-card-grid">
+        <!-- 1. Stress Risk Prediction -->
+        <div class="feature-card">
+            <div class="stat-icon primary" style="margin-bottom: 1rem;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--color-text-title);">Stress Risk Prediction</h3>
+            <p style="color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.55; margin-bottom: 0;">
+                Receive a calibrated stress score and an actionable risk tier based on your personal health and lifestyle patterns.
+            </p>
+        </div>
+
+        <!-- 2. Lifestyle Analysis -->
+        <div class="feature-card">
+            <div class="stat-icon teal" style="margin-bottom: 1rem;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+            </div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--color-text-title);">Lifestyle Analysis</h3>
+            <p style="color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.55; margin-bottom: 0;">
+                Examine the interplay between sleep quality, physical exertion, screen exposure, hydration, and vital signs.
+            </p>
+        </div>
+
+        <!-- 3. Explainable Results -->
+        <div class="feature-card">
+            <div class="stat-icon success" style="margin-bottom: 1rem;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--color-text-title);">Explainable Results</h3>
+            <p style="color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.55; margin-bottom: 0;">
+                Understand which lifestyle and health factors contributed most to your stress-risk result, powered by explainable AI for complete transparency.
+            </p>
+        </div>
+
+        <!-- 4. Personalized Recommendations -->
+        <div class="feature-card">
+            <div class="stat-icon warning" style="margin-bottom: 1rem;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            </div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--color-text-title);">Personalized Recommendations</h3>
+            <p style="color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.55; margin-bottom: 0;">
+                Get actionable wellness tips tailored directly to your specific sleep, physical activity, hydration, and screen habits.
+            </p>
+        </div>
+
+        <!-- 5. Progress & Analytics -->
+        <div class="feature-card">
+            <div class="stat-icon teal" style="margin-bottom: 1rem;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            </div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--color-text-title);">Progress &amp; Analytics</h3>
+            <p style="color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.55; margin-bottom: 0;">
+                Visualize your longitudinal wellness trends across stress levels, sleep correlations, and lifestyle activity over time.
+            </p>
+        </div>
+
+        <!-- 6. Assessment History -->
+        <div class="feature-card">
+            <div class="stat-icon primary" style="margin-bottom: 1rem;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--color-text-title);">Assessment History</h3>
+            <p style="color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.55; margin-bottom: 0;">
+                Safely store and review your chronological check-in records with instant search, risk category filtering, and detailed snapshots.
+            </p>
+        </div>
+
+        <!-- 7. Mindfulness & Wellness -->
+        <div class="feature-card">
+            <div class="stat-icon success" style="margin-bottom: 1rem;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
+            </div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--color-text-title);">Mindfulness &amp; Wellness</h3>
+            <p style="color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.55; margin-bottom: 0;">
+                Practice guided 4-4-4-4 box breathing with visual pacing, 5-4-3-2-1 sensory grounding, and muscle relaxation guides.
+            </p>
+        </div>
+
+        <!-- 8. Secure User Profile -->
+        <div class="feature-card">
+            <div class="stat-icon warning" style="margin-bottom: 1rem;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--color-text-title);">Secure User Profile</h3>
+            <p style="color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.55; margin-bottom: 0;">
+                Protected sessions, encrypted passwords, private records, and customizable light or dark healthcare UI themes.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- 5. LIFESTYLE & HEALTH FACTORS -->
+<section class="landing-section" id="factors" style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: 4rem;">
+    <div class="section-header" style="margin-bottom: 2.5rem;">
+        <span class="section-badge">Holistic Health Dimensions</span>
+        <h2 class="section-title">Lifestyle &amp; Health Factors We Evaluate</h2>
+        <p class="section-desc">Our assessment takes a comprehensive look at your daily routine, evaluating key lifestyle, biometric, and habit indicators to provide a meaningful stress-risk profile.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
+        <!-- Pillar 1: Rest & Sleep -->
+        <div class="pillar-card">
+            <div class="pillar-header">
+                <div class="stat-icon primary" style="width: 34px; height: 34px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                </div>
+                <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--color-text-title); margin: 0;">Rest &amp; Sleep Rhythm</h4>
+            </div>
+            <div style="display: flex; flex-wrap: wrap;">
+                <span class="factor-tag"><span class="factor-tag-dot"></span>Sleep Duration</span>
+                <span class="factor-tag"><span class="factor-tag-dot"></span>Quality of Sleep</span>
+            </div>
+        </div>
+
+        <!-- Pillar 2: Physical Vitals & Body -->
+        <div class="pillar-card">
+            <div class="pillar-header">
+                <div class="stat-icon teal" style="width: 34px; height: 34px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                </div>
+                <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--color-text-title); margin: 0;">Vitals &amp; Activity</h4>
+            </div>
+            <div style="display: flex; flex-wrap: wrap;">
+                <span class="factor-tag"><span class="factor-tag-dot"></span>Resting Heart Rate</span>
+                <span class="factor-tag"><span class="factor-tag-dot"></span>Blood Pressure (Systolic)</span>
+                <span class="factor-tag"><span class="factor-tag-dot"></span>Blood Pressure (Diastolic)</span>
+                <span class="factor-tag"><span class="factor-tag-dot"></span>Body Mass Index (BMI)</span>
+                <span class="factor-tag"><span class="factor-tag-dot"></span>BMI Category</span>
+                <span class="factor-tag"><span class="factor-tag-dot"></span>Physical Activity Level</span>
+                <span class="factor-tag"><span class="factor-tag-dot"></span>Daily Step Count</span>
+            </div>
+        </div>
+
+        <!-- Pillar 3: Work & Screen Routines -->
+        <div class="pillar-card">
+            <div class="pillar-header">
+                <div class="stat-icon warning" style="width: 34px; height: 34px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line></svg>
+                </div>
+                <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--color-text-title); margin: 0;">Work &amp; Digital Habits</h4>
+            </div>
+            <div style="display: flex; flex-wrap: wrap;">
+                <span class="factor-tag"><span class="factor-tag-dot"></span>Daily Working Hours</span>
+                <span class="factor-tag"><span class="factor-tag-dot"></span>Screen Exposure Time</span>
+                <span class="factor-tag"><span class="factor-tag-dot"></span>Social Interaction</span>
+            </div>
+        </div>
+
+        <!-- Pillar 4: Daily Habits & Nutrition -->
+        <div class="pillar-card">
+            <div class="pillar-header">
+                <div class="stat-icon success" style="width: 34px; height: 34px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </div>
+                <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--color-text-title); margin: 0;">Daily Habits &amp; Demographics</h4>
+            </div>
+            <div style="display: flex; flex-wrap: wrap;">
+                <span class="factor-tag"><span class="factor-tag-dot"></span>Daily Water Intake</span>
+                <span class="factor-tag"><span class="factor-tag-dot"></span>Caffeine Consumption</span>
+                <span class="factor-tag"><span class="factor-tag-dot"></span>Smoking Habit</span>
+                <span class="factor-tag"><span class="factor-tag-dot"></span>Alcohol Intake</span>
+                <span class="factor-tag"><span class="factor-tag-dot"></span>Age &amp; Gender</span>
+                <span class="factor-tag"><span class="factor-tag-dot"></span>Occupation</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 6. BENEFITS -->
+<section class="landing-section" id="benefits">
+    <div class="section-header">
+        <span class="section-badge">Why It Matters</span>
+        <h2 class="section-title">Key Health &amp; Wellness Benefits</h2>
+        <p class="section-desc">
+            StressRisk AI equips you with clear, objective insights to make informed, sustainable improvements to your daily routine.
+        </p>
+    </div>
+
+    <div class="grid-2">
+        <div class="card" style="display: flex; gap: 1.25rem;">
+            <div class="stat-icon primary">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+            </div>
+            <div>
+                <h3 style="font-size: 1.15rem; margin-bottom: 0.4rem; color: var(--color-text-title);">Early Stress Awareness</h3>
+                <p style="color: var(--color-text-muted); font-size: 0.92rem; line-height: 1.55; margin-bottom: 0;">
+                    Identify early physical and behavioral signs of rising stress before chronic exhaustion or burnout sets in.
+                </p>
+            </div>
+        </div>
+
+        <div class="card" style="display: flex; gap: 1.25rem;">
+            <div class="stat-icon teal">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            </div>
+            <div>
+                <h3 style="font-size: 1.15rem; margin-bottom: 0.4rem; color: var(--color-text-title);">Clear Contributing Drivers</h3>
+                <p style="color: var(--color-text-muted); font-size: 0.92rem; line-height: 1.55; margin-bottom: 0;">
+                    Understand exactly which behaviors—such as screen exposure or reduced sleep—contribute most to your stress risk.
+                </p>
+            </div>
+        </div>
+
+        <div class="card" style="display: flex; gap: 1.25rem;">
+            <div class="stat-icon success">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <div>
+                <h3 style="font-size: 1.15rem; margin-bottom: 0.4rem; color: var(--color-text-title);">Track Longitudinal Trajectories</h3>
+                <p style="color: var(--color-text-muted); font-size: 0.92rem; line-height: 1.55; margin-bottom: 0;">
+                    Monitor how healthy adjustments in daily steps, sleep, and hydration translate into lower stress levels over time.
+                </p>
+            </div>
+        </div>
+
+        <div class="card" style="display: flex; gap: 1.25rem;">
+            <div class="stat-icon warning">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            </div>
+            <div>
+                <h3 style="font-size: 1.15rem; margin-bottom: 0.4rem; color: var(--color-text-title);">Non-Diagnostic &amp; Supportive</h3>
+                <p style="color: var(--color-text-muted); font-size: 0.92rem; line-height: 1.55; margin-bottom: 0;">
+                    Designed as an empowering lifestyle tool rather than a clinical diagnosis, focusing on actionable wellness steps.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 7. CALL TO ACTION BANNER -->
+<section class="landing-section">
+    <div class="cta-banner">
+        <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem; color: #ffffff;">
+            Ready to Understand Your Stress &amp; Lifestyle Health?
+        </h2>
+        <p style="max-width: 600px; margin: 0 auto 2rem; color: #c7d2fe; font-size: 1.1rem; line-height: 1.6;">
+            Take your free assessment today and receive personalized, data-driven stress insights and actionable wellness guidance.
+        </p>
+        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+            <a href="{{ url_for('assessment') }}" class="btn btn-primary btn-lg" style="background: #ffffff; color: #4f46e5; box-shadow: 0 8px 24px rgba(0,0,0,0.25);">
+                Start Assessment
+            </a>
+            <a href="{{ url_for('register') }}" class="btn btn-secondary btn-lg" style="background: rgba(255,255,255,0.15); color: #ffffff; border-color: rgba(255,255,255,0.3);">
+                Create Account
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- 8. FOOTER -->
+<footer class="footer-landing">
+    <div style="max-width: 1250px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem; border-bottom: 1px solid #1e293b; padding-bottom: 2rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div class="brand-icon-wrapper" style="width: 36px; height: 36px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2a9 9 0 0 1 9 9c0 3.2-1.7 6-4.2 7.6L12 22l-4.8-3.4C4.7 17 3 14.2 3 11a9 9 0 0 1 9-9z"></path></svg>
+                </div>
+                <span style="font-family: var(--font-sans); font-size: 1.15rem; font-weight: 800; color: #ffffff;">StressRisk AI</span>
+            </div>
+
+            <div style="display: flex; gap: 2rem; font-size: 0.9rem;">
+                <a href="{{ url_for('login') }}" style="color: #cbd5e1;">Log In</a>
+                <a href="{{ url_for('register') }}" style="color: #cbd5e1;">Register</a>
+                <a href="{{ url_for('assessment') }}" style="color: #cbd5e1;">Assessment</a>
+                <a href="{{ url_for('mindfulness') }}" style="color: #cbd5e1;">Mindfulness</a>
+            </div>
+        </div>
+
+        <div style="font-size: 0.82rem; color: #64748b; line-height: 1.6;">
+            <strong>Medical Notice:</strong> StressRisk AI provides an informational lifestyle risk estimate based on wellness and health habits. It does not provide clinical medical diagnosis, medical advice, or formal healthcare treatment. If you are experiencing persistent stress, fatigue, cardiovascular symptoms, or mental distress, please consult a qualified healthcare professional.
+        </div>
+
+        <div style="text-align: center; font-size: 0.8rem; color: #475569;">
+            © 2026 StressRisk AI. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

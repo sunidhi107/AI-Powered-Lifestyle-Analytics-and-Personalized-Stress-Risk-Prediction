@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block title %}Stress Assessment — StressRisk AI{% endblock %}
+{% block breadcrumb %}Assessment{% endblock %}
+
+{% block content %}
+
+<div class="topbar">
+    <div class="topbar-heading">
+        <h1>Stress Risk Assessment</h1>
+        <div class="subtitle">Complete the 5 lifestyle sections below (19 verified health indicators) to evaluate your machine learning stress profile.</div>
+    </div>
+</div>
+
+{% if error %}
+<div class="alert alert-error">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0; margin-top: 2px;">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+    <span>{{ error }}</span>
+</div>
+{% endif %}
+
+<div class="card form-card">
+    <form method="POST" action="{{ url_for('predict') }}" id="assessmentForm">
+
+        <!-- SECTION A: PERSONAL INFORMATION -->
+        <div class="form-section-title">
+            <span style="width: 28px; height: 28px; border-radius: 50%; background: #eef2ff; color: #4f46e5; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 800;">A</span>
+            Personal Information
+        </div>
+        <div class="form-section-subtitle">Core demographic context used for baseline modeling.</div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <select id="gender" name="gender" class="form-select" required>
+                    <option value="">Select Gender</option>
+                    <option value="Female" {% if prefill.get('gender') == 'Female' %}selected{% endif %}>Female</option>
+                    <option value="Male" {% if prefill.get('gender') == 'Male' %}selected{% endif %}>Male</option>
+                </select>
+                <span class="helper-text">Select your biological gender</span>
+            </div>
+
+            <div class="form-group">
+                <label for="age">Age (years)</label>
+                <input type="number" id="age" name="age" class="form-control" placeholder="e.g. 30" min="15" max="100" value="{{ prefill.get('age', '') }}" required>
+                <span class="helper-text">Age between 15 and 100</span>
+            </div>
+
+            <div class="form-group">
+                <label for="occupation">Occupation</label>
+                <select id="occupation" name="occupation" class="form-select" required>
+                    <option value="">Select Occupation</option>
+                    {% set occupations = ['Doctor', 'Engineer', 'Lawyer', 'Manager', 'Nurse', 'Sales Representative', 'Salesperson', 'Scientist', 'Software Engineer', 'Teacher', 'Other'] %}
+                    {% for occ in occupations %}
+                    <option value="{{ occ }}" {% if prefill.get('occupation') == occ %}selected{% endif %}>{{ occ }}</option>
+                    {% endfor %}
+                </select>
+                <span class="helper-text">Primary profession or field of work</span>
+            </div>
+        </div>
+
+        <div class="form-section-divider"></div>
+
+        <!-- SECTION B: SLEEP & ACTIVITY -->
+        <div class="form-section-title">
+            <span style="width: 28px; height: 28px; border-radius: 50%; background: #ccfbf1; color: #0d9488; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 800;">B</span>
+            Sleep & Activity
+        </div>
+        <div class="form-section-subtitle">Circadian rest, recovery quality, and physical movement.</div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="sleep_duration">Sleep Duration (hours/night)</label>
+                <input type="number" step="0.1" id="sleep_duration" name="sleep_duration" class="form-control" placeholder="e.g. 7.5" min="2" max="14" value="{{ prefill.get('sleep_duration', '') }}" required>
+                <span class="helper-text">Average nightly sleep hours</span>
+            </div>
+
+            <div class="form-group">
+                <label for="quality_of_sleep">Quality of Sleep (1–10)</label>
+                <input type="number" id="quality_of_sleep" name="quality_of_sleep" class="form-control" placeholder="1 to 10" min="1" max="10" value="{{ prefill.get('quality_of_sleep', '') }}" required>
+                <span class="helper-text">Subjective restfulness score (1 = poor, 10 = excellent)</span>
+            </div>
+
+            <div class="form-group">
+                <label for="physical_activity">Physical Activity Level (min/day)</label>
+                <input type="number" id="physical_activity" name="physical_activity" class="form-control" placeholder="e.g. 45" min="0" max="300" value="{{ prefill.get('physical_activity', '') }}" required>
+                <span class="helper-text">Minutes of exercise or moderate movement per day</span>
+            </div>
+
+            <div class="form-group">
+                <label for="daily_steps">Daily Steps</label>
+                <input type="number" id="daily_steps" name="daily_steps" class="form-control" placeholder="e.g. 8000" min="500" max="35000" value="{{ prefill.get('daily_steps', '') }}" required>
+                <span class="helper-text">Average daily step count</span>
+            </div>
+        </div>
+
+        <div class="form-section-divider"></div>
+
+        <!-- SECTION C: HEALTH METRICS -->
+        <div class="form-section-title">
+            <span style="width: 28px; height: 28px; border-radius: 50%; background: #fef2f2; color: #dc2626; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 800;">C</span>
+            Health Metrics
+        </div>
+        <div class="form-section-subtitle">Cardiovascular metrics and body mass indicators.</div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="heart_rate">Resting Heart Rate (bpm)</label>
+                <input type="number" id="heart_rate" name="heart_rate" class="form-control" placeholder="e.g. 70" min="40" max="140" value="{{ prefill.get('heart_rate', '') }}" required>
+                <span class="helper-text">Resting beats per minute</span>
+            </div>
+
+            <div class="form-group">
+                <label for="systolic_bp">Systolic BP (mmHg)</label>
+                <input type="number" id="systolic_bp" name="systolic_bp" class="form-control" placeholder="e.g. 120" min="80" max="200" value="{{ prefill.get('systolic_bp', '') }}" required>
+                <span class="helper-text">Upper reading (typical: 100–135)</span>
+            </div>
+
+            <div class="form-group">
+                <label for="diastolic_bp">Diastolic BP (mmHg)</label>
+                <input type="number" id="diastolic_bp" name="diastolic_bp" class="form-control" placeholder="e.g. 80" min="50" max="130" value="{{ prefill.get('diastolic_bp', '') }}" required>
+                <span class="helper-text">Lower reading (typical: 60–90)</span>
+            </div>
+
+            <div class="form-group">
+                <label for="bmi">BMI (kg/m²)</label>
+                <input type="number" step="0.1" id="bmi" name="bmi" class="form-control" placeholder="e.g. 23.5" min="10" max="60" value="{{ prefill.get('bmi', '') }}" required>
+                <span class="helper-text">Body Mass Index value</span>
+            </div>
+
+            <div class="form-group">
+                <label for="bmi_category">BMI Category</label>
+                <select id="bmi_category" name="bmi_category" class="form-select" required>
+                    <option value="">Select BMI Category</option>
+                    <option value="Normal" {% if prefill.get('bmi_category') == 'Normal' %}selected{% endif %}>Normal (18.5–24.9)</option>
+                    <option value="Underweight" {% if prefill.get('bmi_category') == 'Underweight' %}selected{% endif %}>Underweight (&lt; 18.5)</option>
+                    <option value="Overweight" {% if prefill.get('bmi_category') == 'Overweight' %}selected{% endif %}>Overweight (25–29.9)</option>
+                    <option value="Obese" {% if prefill.get('bmi_category') == 'Obese' %}selected{% endif %}>Obese (≥ 30)</option>
+                </select>
+                <span class="helper-text">Standard weight classification</span>
+            </div>
+        </div>
+
+        <div class="form-section-divider"></div>
+
+        <!-- SECTION D: WORK & DIGITAL LIFESTYLE -->
+        <div class="form-section-title">
+            <span style="width: 28px; height: 28px; border-radius: 50%; background: #fffbeb; color: #d97706; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 800;">D</span>
+            Work & Digital Lifestyle
+        </div>
+        <div class="form-section-subtitle">Work demands and daily digital exposure.</div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="working_hours">Working Hours (hrs/day)</label>
+                <input type="number" step="0.1" id="working_hours" name="working_hours" class="form-control" placeholder="e.g. 8.0" min="0" max="18" value="{{ prefill.get('working_hours', '') }}" required>
+                <span class="helper-text">Daily work or professional hours</span>
+            </div>
+
+            <div class="form-group">
+                <label for="screen_time">Screen Time (hrs/day)</label>
+                <input type="number" step="0.1" id="screen_time" name="screen_time" class="form-control" placeholder="e.g. 5.0" min="0" max="18" value="{{ prefill.get('screen_time', '') }}" required>
+                <span class="helper-text">Screen exposure across computer, phone, and television</span>
+            </div>
+        </div>
+
+        <div class="form-section-divider"></div>
+
+        <!-- SECTION E: DAILY HABITS -->
+        <div class="form-section-title">
+            <span style="width: 28px; height: 28px; border-radius: 50%; background: #f3e8ff; color: #7c3aed; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 800;">E</span>
+            Daily Habits
+        </div>
+        <div class="form-section-subtitle">Hydration, caffeine, social connection, and substance habits.</div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="water_intake">Water Intake (litres/day)</label>
+                <input type="number" step="0.1" id="water_intake" name="water_intake" class="form-control" placeholder="e.g. 2.5" min="0.5" max="8" value="{{ prefill.get('water_intake', '') }}" required>
+                <span class="helper-text">Daily water consumption in litres</span>
+            </div>
+
+            <div class="form-group">
+                <label for="caffeine_intake">Caffeine Intake (cups/day)</label>
+                <input type="number" step="0.1" id="caffeine_intake" name="caffeine_intake" class="form-control" placeholder="e.g. 2" min="0" max="15" value="{{ prefill.get('caffeine_intake', '') }}" required>
+                <span class="helper-text">Cups of coffee, tea, or caffeinated drinks</span>
+            </div>
+
+            <div class="form-group">
+                <label for="social_interaction">Social Interaction (hrs/day)</label>
+                <input type="number" step="0.1" id="social_interaction" name="social_interaction" class="form-control" placeholder="e.g. 2.0" min="0" max="16" value="{{ prefill.get('social_interaction', '') }}" required>
+                <span class="helper-text">Daily hours interacting with friends or family</span>
+            </div>
+
+            <div class="form-group">
+                <label for="smoking_habit">Smoking Habit</label>
+                <select id="smoking_habit" name="smoking_habit" class="form-select" required>
+                    <option value="">Select Smoking Habit</option>
+                    <option value="No" {% if prefill.get('smoking_habit') == 'No' %}selected{% endif %}>No</option>
+                    <option value="Yes" {% if prefill.get('smoking_habit') == 'Yes' %}selected{% endif %}>Yes</option>
+                </select>
+                <span class="helper-text">Current tobacco or nicotine usage</span>
+            </div>
+
+            <div class="form-group">
+                <label for="alcohol_intake">Alcohol Intake</label>
+                <select id="alcohol_intake" name="alcohol_intake" class="form-select" required>
+                    <option value="">Select Alcohol Intake</option>
+                    <option value="None" {% if prefill.get('alcohol_intake') == 'None' %}selected{% endif %}>None</option>
+                    <option value="Occasional" {% if prefill.get('alcohol_intake') == 'Occasional' %}selected{% endif %}>Occasional</option>
+                    <option value="Frequent" {% if prefill.get('alcohol_intake') == 'Frequent' %}selected{% endif %}>Frequent</option>
+                </select>
+                <span class="helper-text">Frequency of alcohol consumption</span>
+            </div>
+        </div>
+
+        <!-- SUBMIT ACTION -->
+        <div style="margin-top: 2.5rem; display: flex; justify-content: flex-end; align-items: center; gap: 1rem; border-top: 1px solid var(--color-border); padding-top: 1.5rem;">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary btn-lg">
+                Predict My Stress Risk
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </button>
+        </div>
+
+    </form>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Auto-sync BMI Category when BMI value changes
+    const bmiInput = document.getElementById('bmi');
+    const bmiCatSelect = document.getElementById('bmi_category');
+
+    if (bmiInput && bmiCatSelect) {
+        bmiInput.addEventListener('input', function() {
+            const val = parseFloat(this.value);
+            if (!isNaN(val) && val > 0) {
+                if (val < 18.5) {
+                    bmiCatSelect.value = 'Underweight';
+                } else if (val < 25.0) {
+                    bmiCatSelect.value = 'Normal';
+                } else if (val < 30.0) {
+                    bmiCatSelect.value = 'Overweight';
+                } else {
+                    bmiCatSelect.value = 'Obese';
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

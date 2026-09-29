@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}Recommendations — StressRisk AI{% endblock %}
+{% block breadcrumb %}Recommendations{% endblock %}
+
+{% block content %}
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-heading">
+        <h1>Personalized Lifestyle Recommendations</h1>
+        <div class="subtitle">Evidence-informed lifestyle suggestions tailored to your recent assessment profile.</div>
+    </div>
+
+    <div class="topbar-actions">
+        <a href="{{ url_for('assessment') }}" class="btn btn-secondary btn-sm">Update Assessment</a>
+        <a href="{{ url_for('mindfulness') }}" class="btn btn-primary btn-sm">Mindfulness Hub</a>
+    </div>
+</div>
+
+<!-- TOP PRIORITY BACKEND RECOMMENDATIONS -->
+<div class="card" style="margin-bottom: 2rem; border-left: 4px solid var(--color-primary);">
+    <div class="card-header">
+        <h2>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-primary);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            Model-Generated Priorities
+        </h2>
+        <span class="badge {% if risk_level == 'High Risk' %}badge-high{% elif risk_level == 'Medium Risk' %}badge-medium{% else %}badge-low{% endif %}">
+            {{ risk_level }} Focus
+        </span>
+    </div>
+    <p class="card-subtitle">Key recommendations produced from your latest risk calculation.</p>
+
+    <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+        {% if recommendations %}
+            {% for rec in recommendations %}
+            <div style="display: flex; align-items: flex-start; gap: 0.85rem; padding: 0.85rem 1rem; background: var(--color-bg-subtle); border-radius: var(--radius-md);">
+                <span style="color: var(--color-primary); font-weight: 700; font-size: 1rem;">✓</span>
+                <span style="color: var(--color-text-title); font-size: 0.95rem; font-weight: 500; line-height: 1.5;">{{ rec }}</span>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="color: var(--color-text-muted);">Complete an assessment to generate personalized priority guidance.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- LIFESTYLE DOMAINS GRID -->
+<h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 1.25rem;">Targeted Lifestyle Factors</h2>
+
+<div class="grid-2">
+
+    <!-- 1. SLEEP HYGIENE -->
+    <div class="card">
+        <div class="card-header">
+            <h3>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #6366f1;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                Sleep Rest & Recovery
+            </h3>
+            <span class="badge badge-neutral">{{ health.get("sleep_duration", "-") }} hrs reported</span>
+        </div>
+        <p style="color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.6;">
+            {% if health.get("sleep_duration", 8)|float < 7.0 %}
+            • <strong>Consider improving sleep consistency:</strong> Aim for 7 to 8 hours of uninterrupted rest per night to support nervous system reset.
+            <br>• <strong>Try maintaining a wind-down routine:</strong> Dim ambient lighting 45 minutes before bedtime to encourage natural melatonin release.
+            {% else %}
+            • <strong>Try maintaining your healthy sleep duration:</strong> Your current rest duration provides a protective buffer against daily stressors.
+            <br>• <strong>Optimize sleep environment:</strong> Keep your sleeping room cool and dark to preserve sleep quality.
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- 2. PHYSICAL ACTIVITY -->
+    <div class="card">
+        <div class="card-header">
+            <h3>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #059669;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                Physical Movement & Steps
+            </h3>
+            <span class="badge badge-neutral">{{ health.get("physical_activity", "-") }} min/d</span>
+        </div>
+        <p style="color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.6;">
+            {% if health.get("physical_activity", 45)|float < 30.0 %}
+            • <strong>Consider incorporating daily gentle movement:</strong> A comfortable 20-30 minute walk stimulates endorphin production and eases physical tension.
+            <br>• <strong>Target progressive steps:</strong> Aim to gradually elevate daily steps toward 7,000–8,000 steps without strain.
+            {% else %}
+            • <strong>Maintain your regular exercise routine:</strong> Your reported activity level strongly mitigates physiological stress markers.
+            <br>• <strong>Prioritize rest intervals:</strong> Ensure light stretching or restorative movement between strenuous training days.
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- 3. HYDRATION -->
+    <div class="card">
+        <div class="card-header">
+            <h3>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #0284c7;"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+                Hydration & Energy
+            </h3>
+            <span class="badge badge-neutral">{{ health.get("water_intake", "-") }} L/day</span>
+        </div>
+        <p style="color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.6;">
+            {% if health.get("water_intake", 2.5)|float < 2.0 %}
+            • <strong>Consider increasing fluid intake:</strong> Aim for 2.0 to 2.5 litres of water throughout the day, as mild dehydration directly amplifies cortisol levels.
+            <br>• <strong>Start with morning hydration:</strong> Drink a glass of water upon waking to kickstart metabolic energy.
+            {% else %}
+            • <strong>Maintain adequate hydration:</strong> Keep up your consistent fluid replenishment across work hours.
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- 4. SCREEN TIME & BOUNDARIES -->
+    <div class="card">
+        <div class="card-header">
+            <h3>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #d97706;"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line></svg>
+                Screen Time & Digital Boundaries
+            </h3>
+            <span class="badge badge-neutral">{{ health.get("screen_time", "-") }} hrs reported</span>
+        </div>
+        <p style="color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.6;">
+            {% if health.get("screen_time", 4)|float > 5.0 %}
+            • <strong>Consider adopting the 20-20-20 rule:</strong> Every 20 minutes, gaze at an object 20 feet away for 20 seconds to reduce ocular and mental fatigue.
+            <br>• <strong>Establish digital boundaries:</strong> Try keeping screens out of reach during the final 30 minutes before sleep.
+            {% else %}
+            • <strong>Try maintaining your digital balance:</strong> Your moderate screen consumption supports sustained cognitive focus.
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- 5. CAFFEINE INTAKE -->
+    <div class="card">
+        <div class="card-header">
+            <h3>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #b45309;"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+                Caffeine Regulation
+            </h3>
+            <span class="badge badge-neutral">{{ health.get("caffeine_intake", "-") }} cups/day</span>
+        </div>
+        <p style="color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.6;">
+            {% if health.get("caffeine_intake", 2)|float > 3.0 %}
+            • <strong>Consider moderating caffeine dosage:</strong> Limiting intake to 1–2 cups avoids spiking resting heart rate and jitteriness.
+            <br>• <strong>Introduce an afternoon cutoff:</strong> Try avoiding coffee after 2 PM so caffeine does not disrupt deep sleep architecture.
+            {% else %}
+            • <strong>Try maintaining current caffeine timing:</strong> Moderate morning consumption helps preserve smooth natural alertness.
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- 6. MEDITATION & MINDFULNESS -->
+    <div class="card">
+        <div class="card-header">
+            <h3>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #7c3aed;"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                Mindfulness & Nervous Reset
+            </h3>
+            <span class="badge badge-neutral">Daily Practice</span>
+        </div>
+        <p style="color: var(--color-text-muted); font-size: 0.9rem; line-height: 1.6;">
+            • <strong>Try 4-4-4-4 box breathing:</strong> Practice 4 rounds of slow diaphragmatic breathing whenever you notice physical tension building.
+            <br>• <strong>Micro-breaks during work:</strong> Take a 2-minute pause between intense meetings to reset mental bandwidth.
+            <br><a href="{{ url_for('mindfulness') }}" style="font-weight: 600; color: var(--color-primary); display: inline-block; margin-top: 0.4rem;">→ Launch interactive breathing exercises</a>
+        </p>
+    </div>
+
+</div>
+
+<!-- MEDICAL DISCLAIMER -->
+<div style="margin-top: 2rem; padding: 1.25rem 1.5rem; background: var(--color-bg-subtle); border: 1px solid var(--color-border); border-radius: var(--radius-lg); font-size: 0.88rem; color: var(--color-text-muted); line-height: 1.6;">
+    <strong style="color: var(--color-text-title);">Professional Medical Disclaimer:</strong> These lifestyle suggestions are for informational and general wellness purposes only and do not constitute medical or therapeutic advice. For persistent concerns, chronic exhaustion, or clinical symptoms, consider speaking with a qualified healthcare professional.
+</div>
+
+{% endblock %}

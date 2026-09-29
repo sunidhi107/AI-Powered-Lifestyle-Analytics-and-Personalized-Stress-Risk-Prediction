@@ -1,0 +1,310 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — StressRisk AI{% endblock %}
+{% block breadcrumb %}Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-heading">
+        <h1>Welcome back, {{ user_name }}</h1>
+        <div class="subtitle">Here is your latest health pattern and stress risk overview.</div>
+    </div>
+
+    <div class="topbar-actions">
+        <a href="{{ url_for('assessment') }}" class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            New Assessment
+        </a>
+    </div>
+</div>
+
+{% if assessment_count == 0 or not health %}
+<!-- EMPTY STATE -->
+<div class="empty-state">
+    <div class="empty-icon">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+            <line x1="12" y1="11" x2="12" y2="17"></line>
+            <line x1="9" y1="14" x2="15" y2="14"></line>
+        </svg>
+    </div>
+    <h2 class="empty-title">No Assessments Recorded Yet</h2>
+    <p class="empty-desc">
+        Complete your first 19-factor lifestyle assessment to generate your personalized stress risk profile and explainable AI breakdown.
+    </p>
+    <a href="{{ url_for('assessment') }}" class="btn btn-primary btn-lg">
+        Start First Assessment
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+    </a>
+</div>
+
+{% else %}
+
+<!-- STATS SUMMARY CARDS -->
+<div class="stats">
+    <!-- Stress Level -->
+    <div class="stat-card">
+        <div class="stat-card-top">
+            <span class="stat-title">Stress Risk Level</span>
+            <div class="stat-icon {% if risk_level == 'High Risk' %}danger{% elif risk_level == 'Medium Risk' %}warning{% else %}success{% endif %}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+            </div>
+        </div>
+        <div class="stat-value {% if risk_level == 'High Risk' %}high{% elif risk_level == 'Medium Risk' %}medium{% else %}low{% endif %}">
+            {{ risk_level }}
+        </div>
+        <div class="stat-meta">
+            Score: <strong>{{ prediction }}/10</strong> ({{ prediction * 10 }}% Index)
+        </div>
+    </div>
+
+    <!-- Sleep Duration -->
+    <div class="stat-card">
+        <div class="stat-card-top">
+            <span class="stat-title">Sleep Duration</span>
+            <div class="stat-icon teal">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 14 14"></polyline>
+                </svg>
+            </div>
+        </div>
+        <div class="stat-value">
+            {{ sleep_duration }} <span style="font-size: 1.1rem; font-weight: 600; color: var(--color-text-muted);">hrs</span>
+        </div>
+        <div class="stat-meta">
+            Quality Rating: <strong>{{ quality_of_sleep }}/10</strong>
+        </div>
+    </div>
+
+    <!-- Physical Activity -->
+    <div class="stat-card">
+        <div class="stat-card-top">
+            <span class="stat-title">Physical Activity</span>
+            <div class="stat-icon primary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+            </div>
+        </div>
+        <div class="stat-value">
+            {{ health.get("physical_activity", "-") }} <span style="font-size: 1.1rem; font-weight: 600; color: var(--color-text-muted);">min/d</span>
+        </div>
+        <div class="stat-meta">
+            Daily Steps: <strong>{{ daily_steps }}</strong>
+        </div>
+    </div>
+
+    <!-- Resting Heart Rate -->
+    <div class="stat-card">
+        <div class="stat-card-top">
+            <span class="stat-title">Heart Rate & BP</span>
+            <div class="stat-icon danger">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+            </div>
+        </div>
+        <div class="stat-value">
+            {{ heart_rate }} <span style="font-size: 1.1rem; font-weight: 600; color: var(--color-text-muted);">bpm</span>
+        </div>
+        <div class="stat-meta">
+            Blood Pressure: <strong>{{ health.get("systolic_bp", "-") }}/{{ health.get("diastolic_bp", "-") }}</strong>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN GRID: STRESS RISK & LIFESTYLE OVERVIEWS -->
+<div class="grid-2">
+
+    <!-- STRESS RISK OVERVIEW -->
+    <div class="card">
+        <div class="card-header">
+            <h2>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-primary);"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                Stress Risk Overview
+            </h2>
+            <span class="badge {% if risk_level == 'High Risk' %}badge-high{% elif risk_level == 'Medium Risk' %}badge-medium{% else %}badge-low{% endif %}">
+                {{ risk_level }}
+            </span>
+        </div>
+        <p class="card-subtitle">AI model stress score based on your latest biometric profile.</p>
+
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem 0 1rem; text-align: center;">
+            <div style="position: relative; width: 160px; height: 160px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem;">
+                <!-- Circular Gauge SVG -->
+                <svg width="160" height="160" viewBox="0 0 120 120">
+                    <circle cx="60" cy="60" r="50" fill="none" stroke="var(--color-bg-subtle)" stroke-width="10"></circle>
+                    <circle cx="60" cy="60" r="50" fill="none"
+                            stroke="{% if risk_level == 'High Risk' %}#ef4444{% elif risk_level == 'Medium Risk' %}#f59e0b{% else %}#10b981{% endif %}"
+                            stroke-width="10"
+                            stroke-linecap="round"
+                            stroke-dasharray="314.16"
+                            stroke-dashoffset="{{ 314.16 - (314.16 * (prediction / 10)) }}"
+                            transform="rotate(-90 60 60)"
+                            style="transition: stroke-dashoffset 1s ease;">
+                    </circle>
+                </svg>
+                <div style="position: absolute; display: flex; flex-direction: column; align-items: center;">
+                    <span style="font-family: var(--font-sans); font-size: 2.2rem; font-weight: 800; color: var(--color-text-title);">
+                        {{ prediction }}<span style="font-size: 1.1rem; color: var(--color-text-muted);">/10</span>
+                    </span>
+                    <span style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted);">Stress Index</span>
+                </div>
+            </div>
+
+            <div style="max-width: 380px; font-size: 0.92rem; color: var(--color-text-muted); line-height: 1.55;">
+                {% if risk_level == 'High Risk' %}
+                Elevated stress indicators detected across working load and recovery metrics. Consider reviewing recommendations and speaking with a qualified professional.
+                {% elif risk_level == 'Medium Risk' %}
+                Moderate stress indicators observed. Small improvements in wind-down habits and physical movement may enhance wellbeing.
+                {% else %}
+                Favorable stress equilibrium. Your current habits support healthy physiological and psychological resilience.
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- LIFESTYLE OVERVIEW -->
+    <div class="card">
+        <div class="card-header">
+            <h2>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-teal);"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                Lifestyle Overview
+            </h2>
+            <span class="badge badge-neutral">Latest Vitals</span>
+        </div>
+        <p class="card-subtitle">Key behavioral metrics reported during your most recent check-in.</p>
+
+        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+            <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.88rem; font-weight: 600; margin-bottom: 0.35rem;">
+                    <span>Working Hours</span>
+                    <span style="color: var(--color-text-title);">{{ health.get("working_hours", "-") }} hrs/day</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill {% if health.get('working_hours', 0)|float > 9 %}high{% else %}medium{% endif %}"
+                         style="width: {{ [((health.get('working_hours', 8)|float / 12) * 100)|int, 100]|min }}%;"></div>
+                </div>
+            </div>
+
+            <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.88rem; font-weight: 600; margin-bottom: 0.35rem;">
+                    <span>Daily Screen Time</span>
+                    <span style="color: var(--color-text-title);">{{ health.get("screen_time", "-") }} hrs/day</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill {% if health.get('screen_time', 0)|float > 6 %}high{% else %}low{% endif %}"
+                         style="width: {{ [((health.get('screen_time', 4)|float / 12) * 100)|int, 100]|min }}%;"></div>
+                </div>
+            </div>
+
+            <div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.88rem; font-weight: 600; margin-bottom: 0.35rem;">
+                    <span>Water Hydration</span>
+                    <span style="color: var(--color-text-title);">{{ health.get("water_intake", "-") }} L/day</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill low"
+                         style="width: {{ [((health.get('water_intake', 2)|float / 3.5) * 100)|int, 100]|min }}%;"></div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.5rem;">
+                <div style="padding: 0.75rem; background: var(--color-bg-subtle); border-radius: var(--radius-md);">
+                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Social Interaction</div>
+                    <div style="font-weight: 700; color: var(--color-text-title); font-size: 0.92rem; margin-top: 2px;">{{ health.get("social_interaction", "-") }} hrs/d</div>
+                </div>
+                <div style="padding: 0.75rem; background: var(--color-bg-subtle); border-radius: var(--radius-md);">
+                    <div style="font-size: 0.75rem; color: var(--color-text-muted);">Smoking / Alcohol</div>
+                    <div style="font-weight: 700; color: var(--color-text-title); font-size: 0.92rem; margin-top: 2px;">{{ health.get("smoking_habit", "No") }} / {{ health.get("alcohol_intake", "None") }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- RECENT ASSESSMENT & QUICK ACTIONS -->
+<div class="grid-2">
+
+    <!-- RECENT ASSESSMENT CARD -->
+    <div class="card">
+        <div class="card-header">
+            <h2>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-accent);"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                Recent Assessment Summary
+            </h2>
+            <a href="{{ url_for('history') }}" class="btn btn-outline btn-sm">All Records</a>
+        </div>
+        <p class="card-subtitle">Total Completed Assessments: <strong>{{ assessment_count }}</strong></p>
+
+        <div class="table-responsive">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td style="font-weight: 600; width: 45%;">Reported Occupation</td>
+                        <td>{{ health.get("occupation", "-")|capitalize }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 600;">BMI & Category</td>
+                        <td>{{ health.get("bmi", "-") }} ({{ health.get("bmi_category", "-") }})</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 600;">Caffeine Intake</td>
+                        <td>{{ health.get("caffeine_intake", "-") }} cups/day</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 600;">Social Interaction</td>
+                        <td>{{ health.get("social_interaction", "-") }} hrs/day</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="card">
+        <div class="card-header">
+            <h2>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-teal);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                Quick Actions
+            </h2>
+        </div>
+        <p class="card-subtitle">Tools to assess and nurture your mental wellbeing.</p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+            <a href="{{ url_for('assessment') }}" style="display: flex; flex-direction: column; gap: 0.35rem; padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--color-border); background: var(--color-bg-subtle); text-decoration: none; transition: all 0.15s ease;">
+                <span style="font-weight: 700; color: var(--color-text-title); font-size: 0.95rem;">🎯 New Assessment</span>
+                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Re-evaluate your stress risk index</span>
+            </a>
+
+            <a href="{{ url_for('analytics') }}" style="display: flex; flex-direction: column; gap: 0.35rem; padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--color-border); background: var(--color-bg-subtle); text-decoration: none; transition: all 0.15s ease;">
+                <span style="font-weight: 700; color: var(--color-text-title); font-size: 0.95rem;">📊 Visual Analytics</span>
+                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Interactive sleep & stress trends</span>
+            </a>
+
+            <a href="{{ url_for('recommendations') }}" style="display: flex; flex-direction: column; gap: 0.35rem; padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--color-border); background: var(--color-bg-subtle); text-decoration: none; transition: all 0.15s ease;">
+                <span style="font-weight: 700; color: var(--color-text-title); font-size: 0.95rem;">💡 Recommendations</span>
+                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Personalized lifestyle guidelines</span>
+            </a>
+
+            <a href="{{ url_for('mindfulness') }}" style="display: flex; flex-direction: column; gap: 0.35rem; padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--color-border); background: var(--color-bg-subtle); text-decoration: none; transition: all 0.15s ease;">
+                <span style="font-weight: 700; color: var(--color-text-title); font-size: 0.95rem;">🧘 Mindfulness</span>
+                <span style="font-size: 0.8rem; color: var(--color-text-muted);">Box breathing & grounding activity</span>
+            </a>
+        </div>
+    </div>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

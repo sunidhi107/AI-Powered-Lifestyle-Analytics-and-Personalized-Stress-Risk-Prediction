@@ -1,0 +1,51 @@
+{
+  "model_name": "StressRisk AI Random Forest Classifier",
+  "model_file": "saved_model/stressrisk_model.pkl",
+  "feature_file": "saved_model/feature_columns.pkl",
+  "num_features": 19,
+  "features": [
+    "Gender",
+    "Age",
+    "Occupation",
+    "Sleep Duration",
+    "Quality of Sleep",
+    "Physical Activity Level",
+    "Heart Rate",
+    "Daily Steps",
+    "Systolic BP",
+    "Diastolic BP",
+    "BMI",
+    "BMI Category",
+    "Working Hours",
+    "Screen Time",
+    "Water Intake",
+    "Caffeine Intake",
+    "Social Interaction",
+    "Smoking Habit",
+    "Alcohol Intake"
+  ],
+  "target": "Stress Level",
+  "target_classes": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "n_estimators": 300,
+  "excluded_features": [
+    "Person ID",
+    "Meal Regularity",
+    "Meditation Practice"
+  ],
+  "pipeline_steps": [
+    "preprocessor",
+    "model"
+  ],
+  "selected_model": "Random Forest"
+}

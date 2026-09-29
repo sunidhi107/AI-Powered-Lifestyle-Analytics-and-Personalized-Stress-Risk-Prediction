@@ -1,0 +1,72 @@
+/* ==========================================================================
+   STRESSRISK AI — THEME CONTROLLER (LIGHT & DARK MODES)
+   ========================================================================== */
+
+/* Dark Mode Tokens triggered by data-theme="dark" on <html> or body.settings-dark */
+[data-theme="dark"],
+body.settings-dark {
+  --color-bg: #090e17;
+  --color-bg-subtle: #101928;
+  --color-surface: #131f33;
+  --color-surface-hover: #182740;
+  --color-border: #1f314d;
+  --color-border-subtle: #152338;
+
+  --color-text-title: #f8fafc;
+  --color-text-body: #cbd5e1;
+  --color-text-muted: #8da2be;
+  --color-text-subtle: #586e8a;
+
+  --color-primary-light: #1e1b4b;
+  --color-primary-ring: rgba(99, 102, 241, 0.35);
+
+  --color-low-bg: rgba(5, 150, 105, 0.15);
+  --color-low-border: rgba(5, 150, 105, 0.35);
+  --color-med-bg: rgba(217, 119, 6, 0.15);
+  --color-med-border: rgba(217, 119, 6, 0.35);
+  --color-high-bg: rgba(220, 38, 38, 0.15);
+  --color-high-border: rgba(220, 38, 38, 0.35);
+
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] body,
+body.settings-dark {
+  background-color: var(--color-bg);
+  color: var(--color-text-body);
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select,
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] input[type="email"],
+[data-theme="dark"] input[type="password"],
+[data-theme="dark"] input[type="number"],
+[data-theme="dark"] select,
+body.settings-dark .form-control,
+body.settings-dark .form-select,
+body.settings-dark input,
+body.settings-dark select {
+  background-color: #0c1422;
+  border-color: #1f314d;
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .table tbody tr:hover,
+body.settings-dark .table tbody tr:hover {
+  background-color: #16243b;
+}
+
+[data-theme="dark"] .auth-form-side,
+body.settings-dark .auth-form-side {
+  background-color: #131f33;
+}
+
+/* Smooth transition for theme switching */
+html, body, .card, .stat-card, .sidebar, .main, .form-control, select, input {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+}
