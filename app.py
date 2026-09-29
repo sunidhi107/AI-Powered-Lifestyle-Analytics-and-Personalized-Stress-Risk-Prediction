@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sqlite3
 import traceback
 from datetime import datetime
@@ -38,7 +39,10 @@ MODEL_DIR = BASE_DIR / "saved_model"
 
 app = Flask(__name__)
 
-app.secret_key = "stressrisk-ai-development-key-change-in-production"
+app.secret_key = os.environ.get(
+    "SECRET_KEY",
+    "stressrisk-ai-development-key-change-in-production"
+)
 
 
 # ============================================================
